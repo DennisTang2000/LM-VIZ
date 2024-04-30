@@ -1,0 +1,8 @@
+sbatch -J viz0 -o vizoOut -e vizoErr viz0.sh
+sbatch -J viz1 -o viz1Out -e viz1Err viz1.sh
+sbatch -J viz2 -o viz2Out -e viz2Err viz2.sh
+
+
+sbatch -J p0 -o poOut -e poErr p0.sh
+sbatch -J p1 -o p1Out -e p1Err p1.sh
+sbatch -J p2 -o p2Out -e p2Err p2.sh

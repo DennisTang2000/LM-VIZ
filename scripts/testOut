@@ -1,0 +1,27 @@
+LlamaForCausalLM(
+  (model): LlamaModel(
+    (embed_tokens): Embedding(32000, 5120, padding_idx=0)
+    (layers): ModuleList(
+      (0-39): 40 x LlamaDecoderLayer(
+        (self_attn): LlamaAttention(
+          (q_proj): Linear(in_features=5120, out_features=5120, bias=False)
+          (k_proj): Linear(in_features=5120, out_features=5120, bias=False)
+          (v_proj): Linear(in_features=5120, out_features=5120, bias=False)
+          (o_proj): Linear(in_features=5120, out_features=5120, bias=False)
+          (rotary_emb): LlamaRotaryEmbedding()
+        )
+        (mlp): LlamaMLP(
+          (gate_proj): Linear(in_features=5120, out_features=13824, bias=False)
+          (up_proj): Linear(in_features=5120, out_features=13824, bias=False)
+          (down_proj): Linear(in_features=13824, out_features=5120, bias=False)
+          (act_fn): SiLUActivation()
+        )
+        (input_layernorm): LlamaRMSNorm()
+        (post_attention_layernorm): LlamaRMSNorm()
+      )
+    )
+    (norm): LlamaRMSNorm()
+  )
+  (lm_head): Linear(in_features=5120, out_features=32000, bias=False)
+)
+time:  283.34270787239075
