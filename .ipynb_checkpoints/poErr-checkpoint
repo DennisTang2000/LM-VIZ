@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/usr/project/xtmp/dt161/lm_model_analysis/get_percentages.py", line 21, in <module>
+    my_model = finetuned_model_name[model_id]
+NameError: name 'finetuned_model_name' is not defined. Did you mean: 'finetuned_model_names'?

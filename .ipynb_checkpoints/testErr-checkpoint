@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/usr/project/xtmp/dt161/lm_model_analysis/test.py", line 9, in <module>
+    finetuned_model = AutoModelForCausalLM.from_pretrained(finetuned_model_name0[0], device_map="cpu")
+NameError: name 'finetuned_model_name0' is not defined. Did you mean: 'finetuned_model_names'?
