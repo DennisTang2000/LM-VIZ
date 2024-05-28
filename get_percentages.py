@@ -3,6 +3,9 @@ import time
 import torch
 import argparse
 import os
+from transformers import T5Tokenizer, T5ForConditionalGeneration
+
+
 
 parser = argparse.ArgumentParser(description="Grab statistics")
 
@@ -16,7 +19,7 @@ model_id = args.model_option
 
 
 
-finetuned_model_names = [ "../mario/WizardLM-13B-V1.2", "../mario/WizardMath-13B-V1.0", "../mario/llama-2-13b-code-alpaca"]
+finetuned_model_names = [ "../mario/WizardLM-13B-V1.2", "../mario/WizardMath-13B-V1.0", "../mario/llama-2-13b-code-alpaca", "google-t5/t5-base"]
 
 my_model = finetuned_model_names[model_id]
 
@@ -27,6 +30,8 @@ if model_id == 1:
     save_path = "MATH"
 if model_id == 2:
     save_path = "CODE"
+if model_id == 3:
+    save_path = "T5"
     
     
 print(save_path)
@@ -34,7 +39,10 @@ print(save_path)
 os.makedirs(save_path, exist_ok=True)
 
 # start by loading in the fine-tuned model
-finetuned_model = AutoModelForCausalLM.from_pretrained(my_model, device_map="cpu")
+if model_id < 3:
+    finetuned_model = AutoModelForCausalLM.from_pretrained(my_model, device_map="cpu")
+else:
+    finetuned_model = T5ForConditionalGeneration.from_pretrained("google-t5/t5-base")
 
 
 
@@ -42,6 +50,8 @@ finetuned_model = AutoModelForCausalLM.from_pretrained(my_model, device_map="cpu
 model_param_tensor = torch.tensor([]) # will hold all params
 num_params = 0
 for layer_name, weight_value in finetuned_model.named_parameters():
+    
+    if "shared.weight" in layer_name or "layer_norm" in layer_name or "relative_attention" in layer_name: continue
     
     #count the num elements in the current layer
     num_params += weight_value.numel()
@@ -53,7 +63,7 @@ for layer_name, weight_value in finetuned_model.named_parameters():
 
 
 # Grab the top 30% of all positive values from the tensor
-top_values, top_indices = model_param_tensor.abs().topk(k = int(num_params*0.3))
+top_values, top_indices = model_param_tensor.abs().topk(k = int(num_params*0.21))
 
 # Grab the element the is equivalent to the top 30%. All values above this will not be pruned.
 threshold_val = top_values[-1].item()
@@ -68,6 +78,8 @@ mean_dict = {}
 #iterate the model again
 for layer_name, weight_value in finetuned_model.named_parameters():
     
+    if "shared.weight" in layer_name or "layer_norm" in layer_name or "relative_attention" in layer_name: continue
+    
     # Get the norm
     magnitude_dict[layer_name] = torch.norm(weight_value).item()
     
@@ -78,7 +90,10 @@ for layer_name, weight_value in finetuned_model.named_parameters():
     mean_dict[layer_name] = torch.mean(weight_value).item()
     
     # get percentage of each layer that's greater than the threshold: # above threshold/total values
-    percentage_dict[layer_name] = (weight_value.abs() > threshold_val).sum().item() / weight_value.numel()
+    percentage_dict[layer_name] = (weight_value.abs() >= threshold_val).sum().item() / weight_value.numel()
+    
+    print((weight_value.abs() >= threshold_val).sum().item())
+    print(weight_value.numel())
     
     # get the total number of elements
     total_params[layer_name] = weight_value.numel()

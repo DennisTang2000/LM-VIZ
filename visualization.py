@@ -13,7 +13,7 @@ parser.add_argument("--model_option", type=str, help="Which model to run")
 
 # Parse arguments
 args = parser.parse_args()
-model_id = "../" + args.model_option
+model_id = args.model_option
 
 print(model_id)
 
